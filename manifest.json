@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+
+  "name": "Typhon Bot",
+  "description": "A bot to help with specific tasks in Typhon",
+  "version": "0.1",
+
+  "content_scripts": [
+    {
+      "matches": ["https://www2.typhongroup.net/*"],
+      "js": ["typhon.js"]
+    }
+  ],
+
+  "background": {
+    "persistent": true,
+    "scripts": ["background.js"]
+  }
+}

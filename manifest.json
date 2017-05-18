@@ -5,6 +5,10 @@
   "description": "A bot to help with specific tasks in Typhon",
   "version": "0.1",
 
+  "permissions": [
+    "tabs"
+  ],
+
   "content_scripts": [
     {
       "matches": ["https://www2.typhongroup.net/*"],

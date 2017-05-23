@@ -6,7 +6,8 @@
   "version": "0.1",
 
   "permissions": [
-    "tabs"
+    "tabs",
+    "downloads"
   ],
 
   "content_scripts": [

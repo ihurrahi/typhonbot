@@ -29,6 +29,14 @@ function processCaseLogs() {
           }
         }
         if (processing == 0) {
+          // Try to find the next button
+          var imgs = document.getElementsByTagName("img");
+          for (var i = 0; i < imgs.length; i++) {
+            if (imgs[i].src.endsWith("rpt-next.gif") && imgs[i].parentElement.tagName == "A") {
+              imgs[i].parentElement.click();
+              return;
+            }
+          }
           chrome.runtime.sendMessage({"message": "stop"}, function(response) {
             alert("All done!");
           });

@@ -44,7 +44,6 @@ function getData() {
   return res;
 }
 
-// TODO: make a diagram for the flows here because it's all very confusing
 chrome.tabs.onRemoved.addListener(
   function(tabId, removeInfo) {
     for (var i = 0; i < childTabs.length; i++) {

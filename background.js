@@ -2,9 +2,47 @@ var inProgress = false;
 var seen = {};
 var childTabs = [];
 var childDownloads = {};
-var mainTab = null;
 var caseIdMapping = {};
+var mainTab = null;
 var options = null;
+
+function addToSeen(caseLog) {
+  if (!(caseLog in seen)) {
+    seen[caseLog] = {};
+  }
+}
+
+function getData() {
+  var totalDownloads = 0;
+  var res = "Disclaimer: This program attempts to verify the requirements as much as possible, but does not claim to be complete in any way.<br>Things it definitely does not do are: making sure your date range is correct, and verifying that all ICD-10 and CPT codes are valid.<br>";
+  var errors = "";
+  for (var key in seen) {
+    if (seen.hasOwnProperty(key)) {
+      if ("errors" in seen[key]) {
+        errors += "<a target=\"_blank\" href=\"" + seen[key]["caseUrl"] + "\">" + key + "</a>:<br>";
+        for (var i = 0; i < seen[key]["errors"].length; i++) {
+          errors += "  Mismatch of " + seen[key]["errors"][i].join(" and ") + "<br>";
+        }
+      }
+      if ("download" in seen[key]) {
+        totalDownloads += 1;
+      }
+    }
+  }
+  if (options.verify) {
+    if (errors != "") {
+      res += "<br><b>Errors Found</b><br>";
+      res += errors;
+    } else {
+      res += "<br><b>No Errors Found</b><br>";
+    }
+  }
+  if (options.download) {
+    res += "<br><b>Downloads</b><br>";
+    res += "Downloaded a total of " + totalDownloads + " MR's.<br>";
+  }
+  return res;
+}
 
 // TODO: make a diagram for the flows here because it's all very confusing
 chrome.tabs.onRemoved.addListener(
@@ -51,6 +89,7 @@ chrome.downloads.onCreated.addListener(
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
+    console.log("Received " + request.message);
     function sendResponseWrapper(response) {
       response["options"] = options;
       sendResponse(response);
@@ -68,24 +107,31 @@ chrome.runtime.onMessage.addListener(
       sendResponseWrapper({"inProgress": inProgress});
     } else if (request.message == "mainTab.stop") {
       inProgress = false;
+      var data = getData();
+      chrome.tabs.create({url: "data:text/html," + data, selected: true});
       sendResponseWrapper({});
     } else if (request.message == "mainTab.processedCaseLogs") {
       sendResponseWrapper({"seen": seen});
     } else if (request.message == "caseLog.process") {
-      seen[request.caseLog] = true;  // TODO: store more information here
-      console.log("processed " + request.caseLog);
+      addToSeen(request.caseLog);
+      sendResponseWrapper({});
+    } else if (request.message == "caseLog.addInfo") {
+      addToSeen(request.caseLog);
+      seen[request.caseLog]["errors"] = request.errors;
+      seen[request.caseLog]["caseUrl"] = request.caseUrl;
+      sendResponseWrapper({});
+    } else if (request.message == "caseLog.download") {
+      addToSeen(request.caseLog);
+      seen[request.caseLog]["download"] = true;
+      caseIdMapping[request.caseLog] = sender.tab.id;
       sendResponseWrapper({});
     } else if (request.message == "mainTab.newtab") {
-      console.log("newtab");
       chrome.tabs.create({url: request.link, selected: false}, function(tab) {
         childTabs.push(tab.id);
       });
       sendResponseWrapper({});
     } else if (request.message == "mainTab.childTabs") {
       sendResponseWrapper(childTabs);
-    } else if (request.message == "caseLog.download") {
-      caseIdMapping[request.caseId] = sender.tab.id;
-      sendResponseWrapper({});
     } // TODO: add done message to consolidate results
   }
 );

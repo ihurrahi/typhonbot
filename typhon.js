@@ -46,18 +46,65 @@ function processCaseLogs() {
   });
 }
 
-function getCaseId() {
+function parseCaseId() {
   var tables = document.getElementsByTagName("table");
   var caseTable = tables[2];  // Magic
   return caseTable.getElementsByTagName("td")[0].innerText.trim().split("Case ID #: ")[1];
 }
 
+function parseInformation(table) {
+  var res = {};
+  var rows = table.getElementsByTagName("tr");
+  for (var i = 0; i < rows.length; i++) {
+    var text = rows[i].innerText;
+    if (text.includes(":")) {
+      var pair = text.split(":");
+      var key = pair.shift();
+      // Join with ":" in case the value contains a colon
+      res[key] = pair.join(":").trim();
+    }
+  }
+  return res;
+}
+
+function parseCodes(table) {
+  var res = {};
+  var key = "";
+  var rows = table.getElementsByTagName("tr");
+  for (var i = 0; i < rows.length; i++) {
+     var text = rows[i].innerText.trim();
+     if (!text.startsWith("#")) {
+       key = text;
+       res[key] = [];
+     } else {
+       var code = text.split("-");
+       res[key].push(code[1].trim());
+     }
+  }
+  return res;
+}
+
+
+function checkCode(codes, beginning) {
+  var res = false;
+  for (var i = 0; i < codes.length; i++) {
+    for (var j = 0; j < beginning.length; j++) {
+      if (codes[i].startsWith(beginning[j])) {
+        res = true;
+      }
+    }
+  }
+  return res;
+}
+
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
+    console.log("Received " + request.message);
     if (request.message == "caseLog.downloadFinished") {
       processingInProgress -= 1;
       if (processingInProgress == 0) {
-        var caseId = getCaseId();
+        var caseId = parseCaseId();
         finishTab(caseId, {});
       }
     } else if (request.message == "mainTab.childrenDoneProcessing") {
@@ -78,8 +125,10 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
       var tables = document.getElementsByTagName("table");
       var caseTable = tables[2];  // Magic
       var caseId = caseTable.getElementsByTagName("td")[0].innerText.trim().split("Case ID #: ")[1];
+      var caseUrl = window.location.href;
   
       var baseInfoTable = tables[3];
+      var baseInfoInnerTable = tables[4];
       var codesTable = tables[6];
       var otherInfoTable = tables[8];
       var notesTable = tables[9];
@@ -94,7 +143,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           if (otherInfo[i].innerText.includes("Minimum Requirement Encounter")) {
             if (otherInfo[i].innerText.split(":")[1].trim() == "Yes") {
               processingInProgress += 1;
-              chrome.runtime.sendMessage({"message": "caseLog.download", "caseId": caseId});
+              chrome.runtime.sendMessage({"message": "caseLog.download", "caseLog": caseId});
               exportPdf.click();
             }
           }
@@ -103,7 +152,86 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
   
       if (response.options.verify) {
         processingInProgress += 1;
-        // TODO: verify constraints here
+        var errors = [];
+        info = parseInformation(baseInfoInnerTable);
+        codes = parseCodes(codesTable);
+
+        // Geriatric patients
+        age = parseInt(info["Age"].split(" years")[0]);
+        if (age >= 65 && !info["Rotation"].includes("Geriatric")) {
+          errors.push(["Age", "Geriatric Rotation"]);
+        }
+        // Psychiatric disorders
+        is_psychiatric = checkCode(codes["ICD-10 Diagnosis Codes"], ["F"]);
+        if (is_psychiatric && !info["Rotation"].includes("Psychiatric")) {
+          errors.push(["ICD-10 Diagnosis Codes", "Psychiatric rotation"]);
+        }
+        // Annual visits
+        is_annual_visit = info["Reason for Visit"] == "Annual/Well-Person Exam";
+        is_comprehensive = info["Type of HP"] == "Comprehensive";
+        has_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["9939", "9938"]);
+        has_incorrect_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["99205", "99215"]);
+        if ((is_annual_visit && !is_comprehensive) || (!is_annual_visit && is_comprehensive)) {
+          errors.push(["Reason for Visit: Annual visit", "Type of HP: Comprehensive"]);
+        }
+        if ((is_annual_visit && !has_comprehensive_cpt) || (!is_annual_visit && has_comprehensive_cpt)) {
+          errors.push(["Reason for Visit: Annual visit", "CPT Billing Codes"]);
+        }
+        if ((is_comprehensive && !has_comprehensive_cpt) || (!is_comprehensive && has_comprehensive_cpt)) {
+          errors.push(["Type of HP: Comprehensive", "CPT Billing Codes"]);
+        }
+        if (has_incorrect_comprehensive_cpt) {
+          errors.push(["Comprehensive CPT Billing Codes 99205 99215", "0"]);
+        }
+        // No unmarked
+        is_unmarked_rfv = info["Reason for Visit"] == "Unmarked";
+        is_unmarked_hp = info["Type of HP"] == "Unmarked";
+        if (is_unmarked_rfv) {
+          errors.push(["Reason for Visit: Unmarked", "0"]);
+        }
+        if (is_unmarked_hp) {
+          errors.push(["Type of HP: Unmarked", "0"]);
+        }
+        // Problem Focused
+        is_prob_focused = info["Type of HP"] == "Problem Focused";
+        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99202", "99212"]);
+        if ((is_prob_focused && !has_prob_focused_cpt) || (!is_prob_focused && has_prob_focused_cpt)) {
+          errors.push(["Type of HP: Problem Focused", "CPT Billing Codes"]);
+        }
+        // Expanded Problem Focused
+        is_exp_prob_focused = info["Type of HP"] == "Expanded Problem Focused";
+        has_exp_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99203", "99213", "99243"]);
+        if ((is_exp_prob_focused && !has_exp_prob_focused_cpt) || (!is_exp_prob_focused && has_exp_prob_focused_cpt)) {
+          errors.push(["Type of HP: Expanded Problem Focused", "CPT Billing Codes"]);
+        }
+        // Detailed
+        is_detailed = info["Type of HP"] == "Detailed";
+        has_detailed_cpt = checkCode(codes["CPT Billing Codes"], ["99204", "99214", "99244"]);
+        if ((is_detailed && !has_detailed_cpt) || (!is_detailed && has_detailed_cpt)) {
+          errors.push(["Type of HP: Detailed", "CPT Billing Codes"]);
+        }
+        // Initial Visits
+        is_initial = info["Reason for Visit"] == "Initial Visit";
+        has_initial_cpt = checkCode(codes["CPT Billing Codes"], ["9920"]);
+        if ((is_initial && !has_initial_cpt) || (!is_initial && has_initial_cpt)) {
+          errors.push(["Reason for Visit: Initial Visit", "CPT Billing Codes"]);
+        }
+        // New consult
+        is_new_consult = info["Reason for Visit"] == "New Consult";
+        has_new_consult_cpt = checkCode(codes["CPT Billing Codes"], ["9924"]);
+        if ((is_new_consult && !has_new_consult_cpt) || (!is_new_consult && has_new_consult_cpt)) {
+          errors.push(["Reason for Visit: New Consult", "CPT Billing Codes"]);
+        }
+        // Preventative Health
+        has_phealth_cpt = checkCode(codes["CPT Billing Codes"], ["993"]);
+        has_phealth_icd10 = checkCode(codes["ICD-10 Diagnosis Codes"], ["Z"]);
+        if ((has_phealth_cpt && !has_phealth_icd10) || (!has_phealth_cpt && has_phealth_icd10)) {
+          errors.push(["Preventative Health ICD10 Diagnosis Codes", "Preventative Health CPT Billing Codes"]);
+        }
+        if (errors.length > 0) {
+          chrome.runtime.sendMessage({"message": "caseLog.addInfo", "caseLog": caseId, "errors": errors, "caseUrl": caseUrl});
+        }
+
         processingInProgress -= 1;
       }
   

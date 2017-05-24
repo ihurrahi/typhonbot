@@ -3,15 +3,15 @@ var link = document.createElement("a");
 link.href = window.location.href;
 
 function finishTab(caseId, info) {
-  chrome.runtime.sendMessage({"message": "process", "caseLog": caseId}, function(response) {
+  chrome.runtime.sendMessage({"message": "caseLog.process", "caseLog": caseId}, function(response) {
     window.close();
   });
 }
 
 function processCaseLogs() {
-  chrome.runtime.sendMessage({"message": "childTabs"}, function(tabs) {
+  chrome.runtime.sendMessage({"message": "mainTab.childTabs"}, function(tabs) {
     if (tabs.length == 0) {
-      chrome.runtime.sendMessage({"message": "processedCaseLogs"}, function(response) {
+      chrome.runtime.sendMessage({"message": "mainTab.processedCaseLogs"}, function(response) {
         processing = 0;
         var tables = document.getElementsByTagName('table');
         var dataTable = tables[3];  // Magic
@@ -22,7 +22,7 @@ function processCaseLogs() {
           var link = links[i];
           if (link.pathname == "/past/data/viewdetail.asp" && !(link.text in response.seen)) {
             processing += 1;
-            chrome.runtime.sendMessage({"message": "newtab", "link": link.href});
+            chrome.runtime.sendMessage({"message": "mainTab.newtab", "link": link.href});
           }
           if (processing > 3) {
             break;
@@ -37,7 +37,7 @@ function processCaseLogs() {
               return;
             }
           }
-          chrome.runtime.sendMessage({"message": "stop"}, function(response) {
+          chrome.runtime.sendMessage({"message": "mainTab.stop"}, function(response) {
             alert("All done!");
           });
         }
@@ -62,6 +62,8 @@ chrome.runtime.onMessage.addListener(
       }
     } else if (request.message == "mainTab.childrenDoneProcessing") {
       processCaseLogs();
+    } else if (request.message == "mainTab.start") {
+      processCaseLogs();
     }
   }
 );
@@ -70,13 +72,6 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
   if (link.pathname == "/past/data/search.asp") {
     if (response.inProgress == true) {
       processCaseLogs();
-    } else {
-      result = confirm("Do you want to download of all MR's into PDF's? Make sure you have the correct date filter!");
-      if (result) {
-        chrome.runtime.sendMessage({"message": "start"}, function(response) {
-          processCaseLogs();
-        });
-      }
     }
   } else if (link.pathname == "/past/data/viewdetail.asp") {
     if (response.inProgress == true) {
@@ -99,7 +94,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           if (otherInfo[i].innerText.includes("Minimum Requirement Encounter")) {
             if (otherInfo[i].innerText.split(":")[1].trim() == "Yes") {
               processingInProgress += 1;
-              chrome.runtime.sendMessage({"message": "download", "caseId": caseId});
+              chrome.runtime.sendMessage({"message": "caseLog.download", "caseId": caseId});
               exportPdf.click();
             }
           }

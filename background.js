@@ -4,6 +4,7 @@ var childTabs = [];
 var childDownloads = {};
 var mainTab = null;
 var caseIdMapping = {};
+var options = null;
 
 // TODO: make a diagram for the flows here because it's all very confusing
 chrome.tabs.onRemoved.addListener(
@@ -50,34 +51,41 @@ chrome.downloads.onCreated.addListener(
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
+    function sendResponseWrapper(response) {
+      response["options"] = options;
+      sendResponse(response);
+    }
     if (request.message == "popup.start") {
       mainTab = request.tabId;
       seen = {};
       childDownloads = [];
       caseIdMapping = {};
       inProgress = true;
+      options = request.options;
       chrome.tabs.sendMessage(mainTab, {"message": "mainTab.start"});
-      sendResponse({"message": "started"});
+      sendResponseWrapper({"message": "started"});
     } else if (request.message == "inProgress") {
-      sendResponse({"inProgress": inProgress});
+      sendResponseWrapper({"inProgress": inProgress});
     } else if (request.message == "mainTab.stop") {
       inProgress = false;
+      sendResponseWrapper({});
     } else if (request.message == "mainTab.processedCaseLogs") {
-      sendResponse({"seen": seen});
+      sendResponseWrapper({"seen": seen});
     } else if (request.message == "caseLog.process") {
       seen[request.caseLog] = true;  // TODO: store more information here
       console.log("processed " + request.caseLog);
-      sendResponse({});
+      sendResponseWrapper({});
     } else if (request.message == "mainTab.newtab") {
       console.log("newtab");
       chrome.tabs.create({url: request.link, selected: false}, function(tab) {
         childTabs.push(tab.id);
       });
-      sendResponse({});
+      sendResponseWrapper({});
     } else if (request.message == "mainTab.childTabs") {
-      sendResponse(childTabs);
+      sendResponseWrapper(childTabs);
     } else if (request.message == "caseLog.download") {
       caseIdMapping[request.caseId] = sender.tab.id;
+      sendResponseWrapper({});
     } // TODO: add done message to consolidate results
   }
 );

@@ -24,7 +24,7 @@ function processCaseLogs() {
             processing += 1;
             chrome.runtime.sendMessage({"message": "mainTab.newtab", "link": link.href});
           }
-          if (processing > 3) {
+          if (processing >= response.options.numTabs) {
             break;
           }
         }
@@ -88,7 +88,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
       var exportButtons = baseInfo[0];
       var exportPdf = exportButtons.getElementsByTagName("a")[1];
   
-      if (true) {  // TODO: replace with flag
+      if (response.options.download) {
         otherInfo = otherInfoTable.getElementsByTagName("tr");
         for (var i = 0; i < otherInfo.length; i++) {
           if (otherInfo[i].innerText.includes("Minimum Requirement Encounter")) {
@@ -101,9 +101,11 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         }
       }
   
-      processingInProgress += 1;
-      // TODO: verify constraints here
-      processingInProgress -= 1;
+      if (response.options.verify) {
+        processingInProgress += 1;
+        // TODO: verify constraints here
+        processingInProgress -= 1;
+      }
   
       if (processingInProgress == 0) {
         finishTab(caseId, {});

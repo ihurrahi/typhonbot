@@ -1,0 +1,12 @@
+html {
+  width: 175px;
+  height: 175px;
+}
+
+body {
+  text-align: center;
+}
+
+input, button {
+  margin: 10px;
+}

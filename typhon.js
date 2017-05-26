@@ -37,9 +37,7 @@ function processCaseLogs() {
               return;
             }
           }
-          chrome.runtime.sendMessage({"message": "mainTab.stop"}, function(response) {
-            alert("All done!");
-          });
+          chrome.runtime.sendMessage({"message": "mainTab.stop"});
         }
       });
     }

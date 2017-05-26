@@ -222,7 +222,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         }
         // Preventative Health
         has_phealth_cpt = checkCode(codes["CPT Billing Codes"], ["993"]);
-        has_phealth_icd10 = checkCode(codes["ICD-10 Diagnosis Codes"], ["Z"]);
+        has_phealth_icd10 = checkCode(codes["ICD-10 Diagnosis Codes"], ["Z00"]);
         if ((has_phealth_cpt && !has_phealth_icd10) || (!has_phealth_cpt && has_phealth_icd10)) {
           errors.push(["Preventative Health ICD10 Diagnosis Codes", "Preventative Health CPT Billing Codes"]);
         }

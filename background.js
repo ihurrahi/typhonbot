@@ -14,7 +14,22 @@ function addToSeen(caseLog) {
 
 function getData() {
   var totalDownloads = 0;
-  var res = "Disclaimer: This program attempts to verify the requirements as much as possible, but does not claim to be complete in any way.<br>Things it definitely does not do are: making sure your date range is correct, and verifying that all ICD-10 and CPT codes are valid.<br>";
+  var res = "Disclaimer: This program attempts to verify the requirements as much as possible, but only assists in the verification and does not replace everything.<br>\
+It tries to verify the following:<br>\
+* Case logs where the patient is >= 65 years old should be a Geriatric rotation and vice versa<br>\
+* Case logs with a psychiatric disorder diagnosis (ICD-10 code starting with F) should be a Psyhicatric rotation and vice versa<br>\
+* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the Type of HP = Comprehensive and vice versa<br>\
+* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the CPT Billing Code match 9939X or 9938X and vice versa<br>\
+* Case logs should never have CPT Billing Code match 99205 and 99215<br>\
+* Case logs should never have Reason for Visit = Unmarked<br>\
+* Case logs should never have Type of HP = Unmarked<br>\
+* Case logs with the Type of HP = Problem Focused should have the CPT Billing code match 99202 or 99212 or 99282 and vice versa<br>\
+* Case logs with the Type of HP = Expanded Problem Focused should have the CPT Billing code match 99203 or 99213 or 99243 and vice versa<br>\
+* Case logs with the Type of HP = Detailed should have the CPT Billing code match 99204 or 99214 or 99244 or 99284 and vice versa<br>\
+* Case logs with the Reason for Visit = Initial Visit should have the CPT Billing code match 9920X and vice versa<br>\
+* Case logs with the Reason for Visit = New Consult should have the CPT Billing code match 9924X and vice versa<br>\
+* Case logs with a preventative health diagnosis (ICD-10 Diagnosis code starting with Z00) should have the CPT Billing code match 993XX and vice versa<br>\
+* Case logs with the Reason for Visit = Scheduled Procedure should have Intra-op checked under Surgical Management and vice versa<br>";
   var errors = "";
   for (var key in seen) {
     if (seen.hasOwnProperty(key)) {

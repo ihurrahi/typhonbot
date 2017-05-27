@@ -192,19 +192,19 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         }
         // Problem Focused
         is_prob_focused = info["Type of HP"] == "Problem Focused";
-        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99202", "99212"]);
+        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99202", "99212", "99282"]);
         if ((is_prob_focused && !has_prob_focused_cpt) || (!is_prob_focused && has_prob_focused_cpt)) {
           errors.push(["Type of HP: Problem Focused", "CPT Billing Codes"]);
         }
         // Expanded Problem Focused
         is_exp_prob_focused = info["Type of HP"] == "Expanded Problem Focused";
-        has_exp_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99203", "99213", "99243"]);
+        has_exp_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99203", "99213", "99243", "99283"]);
         if ((is_exp_prob_focused && !has_exp_prob_focused_cpt) || (!is_exp_prob_focused && has_exp_prob_focused_cpt)) {
           errors.push(["Type of HP: Expanded Problem Focused", "CPT Billing Codes"]);
         }
         // Detailed
         is_detailed = info["Type of HP"] == "Detailed";
-        has_detailed_cpt = checkCode(codes["CPT Billing Codes"], ["99204", "99214", "99244"]);
+        has_detailed_cpt = checkCode(codes["CPT Billing Codes"], ["99204", "99214", "99244", "99284"]);
         if ((is_detailed && !has_detailed_cpt) || (!is_detailed && has_detailed_cpt)) {
           errors.push(["Type of HP: Detailed", "CPT Billing Codes"]);
         }

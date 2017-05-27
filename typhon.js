@@ -156,12 +156,14 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
 
         // Geriatric patients
         age = parseInt(info["Age"].split(" years")[0]);
-        if (age >= 65 && !info["Rotation"].includes("Geriatric")) {
+        geriatric = info["Rotation"].includes("Geriatric")
+        if ((age >= 65 && !geriatric) || (!(age >= 65) && geriatric)) {
           errors.push(["Age", "Geriatric Rotation"]);
         }
         // Psychiatric disorders
         is_psychiatric = checkCode(codes["ICD-10 Diagnosis Codes"], ["F"]);
-        if (is_psychiatric && !info["Rotation"].includes("Psychiatric")) {
+        psychiatric_rotation = info["Rotation"].includes("Psychiatric")
+        if ((is_psychiatric && !psychiatric_rotation) || (!is_psychiatric && psychiatric_rotation)) {
           errors.push(["ICD-10 Diagnosis Codes", "Psychiatric rotation"]);
         }
         // Annual visits

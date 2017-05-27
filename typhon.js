@@ -226,6 +226,13 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         if ((has_phealth_cpt && !has_phealth_icd10) || (!has_phealth_cpt && has_phealth_icd10)) {
           errors.push(["Preventative Health ICD10 Diagnosis Codes", "Preventative Health CPT Billing Codes"]);
         }
+        // Surgery
+        is_scheduled = info["Reason for Visit"] == "Scheduled Procedure";
+        is_intra_op = info["Setting Type"].includes("Intra-op");
+        if ((is_scheduled && !is_intra_op) || (!is_scheduled && is_intra_op)) {
+          errors.push(["Reason for Visit: Scheduled Procedure", "Surgical Management (intra-op)"]);
+        }
+
         if (errors.length > 0) {
           chrome.runtime.sendMessage({"message": "caseLog.addInfo", "caseLog": caseId, "errors": errors, "caseUrl": caseUrl});
         }

@@ -194,7 +194,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         }
         // Problem Focused
         is_prob_focused = info["Type of HP"] == "Problem Focused";
-        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99202", "99212", "99282"]);
+        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99201", "99202", "99212", "99282"]);
         if ((is_prob_focused && !has_prob_focused_cpt) || (!is_prob_focused && has_prob_focused_cpt)) {
           errors.push(["Type of HP: Problem Focused", "CPT Billing Codes"]);
         }

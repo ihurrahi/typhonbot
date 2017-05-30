@@ -18,8 +18,8 @@ function getData() {
 It tries to verify the following:<br>\
 * Case logs where the patient is >= 65 years old should be a Geriatric rotation and vice versa<br>\
 * Case logs with a psychiatric disorder diagnosis (ICD-10 code starting with F) should be a Psyhicatric rotation and vice versa<br>\
-* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the Type of HP = Comprehensive and vice versa<br>\
-* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the CPT Billing Code match 9939X or 9938X and vice versa<br>\
+* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the Type of HP = Comprehensive (or Detailed for OB/GYN) and vice versa<br>\
+* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the CPT Billing Code match 9939X or 9938X (or 99204 or 99214 for OBGYN) and vice versa<br>\
 * Case logs should never have CPT Billing Code match 99205 and 99215<br>\
 * Case logs should never have Reason for Visit = Unmarked<br>\
 * Case logs should never have Type of HP = Unmarked<br>\

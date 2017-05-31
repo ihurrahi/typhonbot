@@ -166,6 +166,20 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         if ((is_psychiatric && !psychiatric_rotation) || (!is_psychiatric && psychiatric_rotation)) {
           errors.push(["ICD-10 Diagnosis Codes", "Psychiatric rotation"]);
         }
+        // Sports Physicals
+        is_sports_physical = info["Reason for Visit"] == "Sports Physical";
+        is_detailed = info["Type of HP"] == "Detailed";
+        is_sports_physical_diagnosis = checkCode(codes["ICD-10 Diagnosis Codes"], ["Z02.5"]);
+        has_detailed_cpt_sp = checkCode(codes["CPT Billing Codes"], ["99204", "99214"]);
+        if ((is_sports_physical && !is_sports_physical_diagnosis) || (!is_sports_physical && is_sports_physical_diagnosis)) {
+          errors.push(["Reason for Visit: Sports Physical", "ICD-10 Diagnosis Code Z02.5"]);
+        }
+        if ((is_sports_physical || is_sports_physical_diagnosis) && !is_detailed) {
+          errors.push(["Reason for Visit: Sports Physical or ICD-10 Diagnosis Code Z02.5", "Type of HP: Detailed"]);
+        }
+        if ((is_sports_physical || is_sports_physical_diagnosis) && !has_detailed_cpt_sp)) {
+          errors.push(["Reason for Visit: Sports Physical or ICD-10 Diagnosis Code Z02.5", "CPT Billing Codes"]);
+        }
         // Annual visits
         is_annual_visit = info["Reason for Visit"] == "Annual/Well-Person Exam";
         is_comprehensive = info["Type of HP"] == "Comprehensive";

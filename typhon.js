@@ -183,14 +183,12 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         // Annual visits
         is_annual_visit = info["Reason for Visit"] == "Annual/Well-Person Exam";
         is_comprehensive = info["Type of HP"] == "Comprehensive";
-        is_detailed = info["Type of HP"] == "Detailed";
         has_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["9939", "9938"]);
-        has_detailed_cpt_obgyn = checkCode(codes["CPT Billing Codes"], ["99204", "99214"]);
         has_incorrect_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["99205", "99215"]);
-        if ((is_annual_visit && (!is_comprehensive && !is_detailed)) || (!is_annual_visit && is_comprehensive)) {
-          errors.push(["Reason for Visit: Annual visit", "Type of HP: Comprehensive or Detailed (for OB/GYN)"]);
+        if ((is_annual_visit && !is_comprehensive) || (!is_annual_visit && is_comprehensive)) {
+          errors.push(["Reason for Visit: Annual visit", "Type of HP: Comprehensive"]);
         }
-        if ((is_annual_visit && (!has_comprehensive_cpt && !has_detailed_cpt_obgyn)) || (!is_annual_visit && has_comprehensive_cpt)) {
+        if ((is_annual_visit && !has_comprehensive_cpt) || (!is_annual_visit && has_comprehensive_cpt)) {
           errors.push(["Reason for Visit: Annual visit", "CPT Billing Codes"]);
         }
         if ((is_comprehensive && !has_comprehensive_cpt) || (!is_comprehensive && has_comprehensive_cpt)) {

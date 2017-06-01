@@ -177,7 +177,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         if ((is_sports_physical || is_sports_physical_diagnosis) && !is_detailed) {
           errors.push(["Reason for Visit: Sports Physical or ICD-10 Diagnosis Code Z02.5", "Type of HP: Detailed"]);
         }
-        if ((is_sports_physical || is_sports_physical_diagnosis) && !has_detailed_cpt_sp)) {
+        if ((is_sports_physical || is_sports_physical_diagnosis) && !has_detailed_cpt_sp) {
           errors.push(["Reason for Visit: Sports Physical or ICD-10 Diagnosis Code Z02.5", "CPT Billing Codes"]);
         }
         // Annual visits

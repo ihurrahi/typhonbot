@@ -87,7 +87,7 @@ function checkCode(codes, beginning) {
   var res = false;
   for (var i = 0; i < codes.length; i++) {
     for (var j = 0; j < beginning.length; j++) {
-      if (codes[i].startsWith(beginning[j])) {
+      if (codes[i].toLowerCase().startsWith(beginning[j].toLowerCase())) {
         res = true;
       }
     }

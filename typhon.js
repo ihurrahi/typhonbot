@@ -181,21 +181,10 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           errors.push(["Reason for Visit: Sports Physical or ICD-10 Diagnosis Code Z02.5", "CPT Billing Codes"]);
         }
         // Annual visits
-        is_annual_visit = info["Reason for Visit"] == "Annual/Well-Person Exam";
         is_comprehensive = info["Type of HP"] == "Comprehensive";
-        has_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["9939", "9938"]);
-        has_incorrect_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["99205", "99215"]);
-        if ((is_annual_visit && !is_comprehensive) || (!is_annual_visit && is_comprehensive)) {
-          errors.push(["Reason for Visit: Annual visit", "Type of HP: Comprehensive"]);
-        }
-        if ((is_annual_visit && !has_comprehensive_cpt) || (!is_annual_visit && has_comprehensive_cpt)) {
-          errors.push(["Reason for Visit: Annual visit", "CPT Billing Codes"]);
-        }
+        has_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["9939", "9938", "99205", "99215"]);
         if ((is_comprehensive && !has_comprehensive_cpt) || (!is_comprehensive && has_comprehensive_cpt)) {
           errors.push(["Type of HP: Comprehensive", "CPT Billing Codes"]);
-        }
-        if (has_incorrect_comprehensive_cpt) {
-          errors.push(["Comprehensive CPT Billing Codes 99205 99215", "0"]);
         }
         // No unmarked
         is_unmarked_rfv = info["Reason for Visit"] == "Unmarked";

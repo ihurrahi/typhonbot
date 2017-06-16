@@ -21,9 +21,7 @@ It tries to verify the following:<br>\
 * Case logs with the Reason for Visit = Sports Physical should have a sports physical diagnosis code (ICD-10 code that equals Z02.5) and vice versa<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the Type of HP = Detailed<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the CPT Billing Code match 99204 or 99214<br>\
-* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the Type of HP = Comprehensive and vice versa<br>\
-* Case logs with the Reason for Visit = Annual/Well-Person Exam should have the CPT Billing Code match 9939X or 9938X and vice versa<br>\
-* Case logs should never have CPT Billing Code match 99205 and 99215<br>\
+* Case logs with the Type of HP = Comprehensive should have the CPT Billing Code match 9939X or 9938X or 99205 or 99215 and vice versa<br>\
 * Case logs should never have Reason for Visit = Unmarked<br>\
 * Case logs should never have Type of HP = Unmarked<br>\
 * Case logs with the Type of HP = Problem Focused should have the CPT Billing code match 99202 or 99212 or 99282 and vice versa<br>\

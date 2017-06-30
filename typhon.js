@@ -182,7 +182,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         }
         // Annual visits
         is_comprehensive = info["Type of HP"] == "Comprehensive";
-        has_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["9939", "9938", "99205", "99215"]);
+        has_comprehensive_cpt = checkCode(codes["CPT Billing Codes"], ["99205", "99215", "99285", "99310", "99306", "99245", "99222", "99223", "99255", "99234", "99235", "9939", "9938"]);
         if ((is_comprehensive && !has_comprehensive_cpt) || (!is_comprehensive && has_comprehensive_cpt)) {
           errors.push(["Type of HP: Comprehensive", "CPT Billing Codes"]);
         }
@@ -197,19 +197,19 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         }
         // Problem Focused
         is_prob_focused = info["Type of HP"] == "Problem Focused";
-        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99201", "99202", "99212", "99282"]);
+        has_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99201", "99202", "99211", "99212", "99281", "99282", "99307", "99241", "99242", "99252", "99231"]);
         if ((is_prob_focused && !has_prob_focused_cpt) || (!is_prob_focused && has_prob_focused_cpt)) {
           errors.push(["Type of HP: Problem Focused", "CPT Billing Codes"]);
         }
         // Expanded Problem Focused
         is_exp_prob_focused = info["Type of HP"] == "Expanded Problem Focused";
-        has_exp_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99203", "99213", "99243", "99283"]);
+        has_exp_prob_focused_cpt = checkCode(codes["CPT Billing Codes"], ["99203", "99213", "99283", "99308", "99304", "99243", "99253", "99232"]);
         if ((is_exp_prob_focused && !has_exp_prob_focused_cpt) || (!is_exp_prob_focused && has_exp_prob_focused_cpt)) {
           errors.push(["Type of HP: Expanded Problem Focused", "CPT Billing Codes"]);
         }
         // Detailed
         is_detailed = info["Type of HP"] == "Detailed";
-        has_detailed_cpt = checkCode(codes["CPT Billing Codes"], ["99204", "99214", "99244", "99284"]);
+        has_detailed_cpt = checkCode(codes["CPT Billing Codes"], ["99204", "99214", "99284", "99309", "99305", "99244", "99221", "99254", "99233"]);
         if ((is_detailed && !has_detailed_cpt) || (!is_detailed && has_detailed_cpt)) {
           errors.push(["Type of HP: Detailed", "CPT Billing Codes"]);
         }

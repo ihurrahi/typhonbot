@@ -21,12 +21,12 @@ It tries to verify the following:<br>\
 * Case logs with the Reason for Visit = Sports Physical should have a sports physical diagnosis code (ICD-10 code that equals Z02.5) and vice versa<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the Type of HP = Detailed<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the CPT Billing Code match 99204 or 99214<br>\
-* Case logs with the Type of HP = Comprehensive should have the CPT Billing Code match 9939X or 9938X or 99205 or 99215 and vice versa<br>\
+* Case logs with the Type of HP = Comprehensive should have the CPT Billing Code match 99205 or 99215 or 99285 or 99310 or 99306 or 99245 or 99222 or 99223 or 99255 or 99234 or 99235 or 9939X or 9938X and vice versa<br>\
 * Case logs should never have Reason for Visit = Unmarked<br>\
 * Case logs should never have Type of HP = Unmarked<br>\
-* Case logs with the Type of HP = Problem Focused should have the CPT Billing code match 99202 or 99212 or 99282 and vice versa<br>\
-* Case logs with the Type of HP = Expanded Problem Focused should have the CPT Billing code match 99203 or 99213 or 99243 and vice versa<br>\
-* Case logs with the Type of HP = Detailed should have the CPT Billing code match 99204 or 99214 or 99244 or 99284 and vice versa<br>\
+* Case logs with the Type of HP = Problem Focused should have the CPT Billing code match 99201 or 99202 or 99211 or 99212 or 99281 or 99282 or 99307 or 99241 or 99242 or 99252 or 99231 and vice versa<br>\
+* Case logs with the Type of HP = Expanded Problem Focused should have the CPT Billing code match 99203 or 99213 or 99283 or 99308 or 99304 or 99243 or 99253 or 99232 and vice versa<br>\
+* Case logs with the Type of HP = Detailed should have the CPT Billing code match 99204 or 99214 or 99284 or 99309 or 99305 or 99244 or 99221 or 99254 or 99233 and vice versa<br>\
 * Case logs with the Reason for Visit = Initial Visit should have the CPT Billing code match 9920X and vice versa<br>\
 * Case logs with the Reason for Visit = New Consult should have the CPT Billing code match 9924X and vice versa<br>\
 * Case logs with a preventative health diagnosis (ICD-10 Diagnosis code starting with Z00) should have the CPT Billing code match 993XX and vice versa<br>\

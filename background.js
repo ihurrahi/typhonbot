@@ -17,6 +17,13 @@ function getData() {
   var res = "Disclaimer: This program attempts to verify the requirements as much as possible, but only assists in the verification and does not replace everything.<br>\
 It tries to verify the following:<br>\
 * Case logs where the patient is >= 65 years old should be a Geriatric rotation and vice versa<br>\
+* Case logs where the CPT Billing Code match 99391 or 99381 should have a patient that is < 1 year old<br>\
+* Case logs where the CPT Billing Code match 99392 or 99382 should have a patient that is >= 1 year old and <= 4 years old<br>\
+* Case logs where the CPT Billing Code match 99393 or 99383 should have a patient that is >= 5 years old and <= 11 years old<br>\
+* Case logs where the CPT Billing Code match 99394 or 99384 should have a patient that is >= 12 year old and <= 17 years old<br>\
+* Case logs where the CPT Billing Code match 99395 or 99385 should have a patient that is >= 18 year old and <= 39 years old<br>\
+* Case logs where the CPT Billing Code match 99396 or 99386 should have a patient that is >= 40 year old and <= 64 years old<br>\
+* Case logs where the CPT Billing Code match 99397 or 99387 should have a patient that is >= 65 year old<br>\
 * Case logs with a psychiatric disorder diagnosis (ICD-10 code starting with F or G47.00) should be a Psyhicatric rotation and vice versa<br>\
 * Case logs with the Reason for Visit = Sports Physical should have a sports physical diagnosis code (ICD-10 code that equals Z02.5) and vice versa<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the Type of HP = Detailed<br>\

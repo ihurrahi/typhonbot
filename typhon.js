@@ -154,11 +154,37 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         info = parseInformation(baseInfoInnerTable);
         codes = parseCodes(codesTable);
 
+        age_str = info["Age"].split(" ");
+        if (age_str[1].startsWith("year")) {
+          age = parseInt(age_str[0]);
+        } else if (age_str[1].startsWith("month")) {
+          age = parseInt(age_str[0]) / 12;
+        } else if (age_str[1].startsWith("week")) {
+          age = parseInt(age_str[0]) / 52;
+        } else if (age_str[1].startsWith("day")) {
+          age = parseInt(age_str[0]) / 365;
+        }
         // Geriatric patients
-        age = parseInt(info["Age"].split(" years")[0]);
         geriatric = info["Rotation"].includes("Geriatric")
         if ((age >= 65 && !geriatric) || (!(age >= 65) && geriatric)) {
           errors.push(["Age", "Geriatric Rotation"]);
+        }
+        // Age constraints
+        age_constraint1 = checkCode(codes["CPT Billing Codes"], ["99391", "99381"]);
+        age_constraint2 = checkCode(codes["CPT Billing Codes"], ["99392", "99382"]);
+        age_constraint3 = checkCode(codes["CPT Billing Codes"], ["99393", "99383"]);
+        age_constraint4 = checkCode(codes["CPT Billing Codes"], ["99394", "99384"]);
+        age_constraint5 = checkCode(codes["CPT Billing Codes"], ["99395", "99385"]);
+        age_constraint6 = checkCode(codes["CPT Billing Codes"], ["99396", "99386"]);
+        age_constraint7 = checkCode(codes["CPT Billing Codes"], ["99397", "99387"]);
+        if ((age_constraint1 && !(age < 1)) ||
+            (age_constraint2 && !(age >= 1 && age <= 4)) ||
+            (age_constraint3 && !(age >= 5 && age <= 11)) ||
+            (age_constraint4 && !(age >= 12 && age <= 17)) ||
+            (age_constraint5 && !(age >= 18 && age <= 39)) ||
+            (age_constraint6 && !(age >= 40 && age <= 64)) ||
+            (age_constraint7 && !(age >= 65))) {
+          errors.push(["Age", "CPT Billing Codes"]);
         }
         // Psychiatric disorders
         is_psychiatric = checkCode(codes["ICD-10 Diagnosis Codes"], ["F", "G47.00"]);

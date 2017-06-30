@@ -36,7 +36,7 @@ It tries to verify the following:<br>\
 * Case logs with the Type of HP = Detailed should have the CPT Billing code match 99204 or 99214 or 99284 or 99309 or 99305 or 99244 or 99221 or 99254 or 99233 and vice versa<br>\
 * Case logs with the Reason for Visit = Initial Visit should have the CPT Billing code match 9920X and vice versa<br>\
 * Case logs with the Reason for Visit = New Consult should have the CPT Billing code match 9924X and vice versa<br>\
-* Case logs with a preventative health diagnosis (ICD-10 Diagnosis code starting with Z00) should have the CPT Billing code match 993XX and vice versa<br>\
+* Case logs with a preventative health diagnosis (ICD-10 Diagnosis code starting with Z00 or Z01.4) should have the CPT Billing code match 993XX<br>\
 * Case logs with the Reason for Visit = Scheduled Procedure should have Intra-op checked under Surgical Management and vice versa<br>";
   var errors = "";
   for (var key in seen) {

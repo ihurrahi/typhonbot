@@ -17,7 +17,7 @@ function getData() {
   var res = "Disclaimer: This program attempts to verify the requirements as much as possible, but only assists in the verification and does not replace everything.<br>\
 It tries to verify the following:<br>\
 * Case logs where the patient is >= 65 years old should be a Geriatric rotation and vice versa<br>\
-* Case logs with a psychiatric disorder diagnosis (ICD-10 code starting with F) should be a Psyhicatric rotation and vice versa<br>\
+* Case logs with a psychiatric disorder diagnosis (ICD-10 code starting with F or G47.00) should be a Psyhicatric rotation and vice versa<br>\
 * Case logs with the Reason for Visit = Sports Physical should have a sports physical diagnosis code (ICD-10 code that equals Z02.5) and vice versa<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the Type of HP = Detailed<br>\
 * Case logs with the Reason for Visit = Sports Physical or sports physical diagnosis code (ICD-10 code that equals Z02.5) should have the CPT Billing Code match 99204 or 99214<br>\

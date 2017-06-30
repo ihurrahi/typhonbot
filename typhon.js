@@ -161,7 +161,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           errors.push(["Age", "Geriatric Rotation"]);
         }
         // Psychiatric disorders
-        is_psychiatric = checkCode(codes["ICD-10 Diagnosis Codes"], ["F"]);
+        is_psychiatric = checkCode(codes["ICD-10 Diagnosis Codes"], ["F", "G47.00"]);
         psychiatric_rotation = info["Rotation"].includes("Psychiatric")
         if ((is_psychiatric && !psychiatric_rotation) || (!is_psychiatric && psychiatric_rotation)) {
           errors.push(["ICD-10 Diagnosis Codes", "Psychiatric rotation"]);

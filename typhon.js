@@ -50,38 +50,48 @@ function parseCaseId() {
   return caseTable.getElementsByTagName("td")[0].innerText.trim().split("Case ID #: ")[1];
 }
 
-function parseInformation(table) {
+function parseInformation(tables) {
   var res = {};
-  var rows = table.getElementsByTagName("tr");
-  for (var i = 0; i < rows.length; i++) {
-    var text = rows[i].innerText;
-    if (text.includes(":")) {
-      var pair = text.split(":");
-      var key = pair.shift();
-      // Join with ":" in case the value contains a colon
-      res[key] = pair.join(":").trim();
+  for (var i = 0; i < tables.length; i++) {
+    var table = tables[i];
+    rows = table.getElementsByTagName("tr");
+    for (var j = 0; j < rows.length; j++) {
+      var text = rows[j].innerText;
+      if (text.includes(":")) {
+        var pair = text.split(":");
+        var key = pair.shift();
+        // Join with ":" in case the value contains a colon
+        res[key] = pair.join(":").trim();
+      }
     }
   }
   return res;
 }
 
-function parseCodes(table) {
+function parseCodes(tables) {
   var res = {};
   var key = "";
-  var rows = table.getElementsByTagName("tr");
-  for (var i = 0; i < rows.length; i++) {
-     var text = rows[i].innerText.trim();
-     if (!text.startsWith("#")) {
-       key = text;
-       res[key] = [];
-     } else {
-       var code = text.split("-");
-       res[key].push(code[1].trim());
-     }
+  for (var i = 0; i < tables.length; i++) {
+    var table = tables[i];
+    var rows = table.getElementsByTagName("tr");
+    for (var j = 0; j < rows.length; j++) {
+       var elements = rows[j].getElementsByTagName("td");
+       var text = rows[j].innerText.trim();
+       if (elements[0].getAttribute("bgcolor") == "#000000") {
+         if (text == "ICD-10 Diagnosis Codes" || text == "CPT Billing Codes") {
+           key = text;
+           res[key] = [];
+         } else {
+           key = "";
+         }
+       } else if (key != "") {
+         var code = text.split("-");
+         res[key].push(code[1].trim());
+       }
+    }
   }
   return res;
 }
-
 
 function checkCode(codes, beginning) {
   var res = false;
@@ -121,29 +131,28 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
   } else if (link.pathname == "/past/data/viewdetail.asp") {
     if (response.inProgress == true) {
       var tables = document.getElementsByTagName("table");
-      var caseTable = tables[2];  // Magic
-      var caseId = caseTable.getElementsByTagName("td")[0].innerText.trim().split("Case ID #: ")[1];
+      var info = parseInformation(tables);
+      var codes = parseCodes(tables);
+      var caseId = parseCaseId();
       var caseUrl = window.location.href;
-  
-      var baseInfoTable = tables[3];
-      var baseInfoInnerTable = tables[4];
-      var codesTable = tables[6];
-      var otherInfoTable = tables[8];
-      var notesTable = tables[9];
-  
-      var baseInfo = baseInfoTable.getElementsByTagName("tr");
-      var exportButtons = baseInfo[0];
-      var exportPdf = exportButtons.getElementsByTagName("a")[1];
-  
+
       if (response.options.download) {
-        otherInfo = otherInfoTable.getElementsByTagName("tr");
-        for (var i = 0; i < otherInfo.length; i++) {
-          if (otherInfo[i].innerText.includes("Minimum Requirement Encounter")) {
-            if (otherInfo[i].innerText.split(":")[1].trim() == "Yes") {
-              processingInProgress += 1;
-              chrome.runtime.sendMessage({"message": "caseLog.download", "caseLog": caseId});
-              exportPdf.click();
+        if (info["Minimum Requirement Encounter"] == "Yes") {
+          var links = document.getElementsByTagName("a");
+          var exportPdf = null;
+          for (var i = 0; i < links.length; i++) {
+            if (links[i].href.includes("pdfoutput-past.asp")) {
+              exportPdf = links[i];
+              break;
             }
+          }
+
+          processingInProgress += 1;
+          chrome.runtime.sendMessage({"message": "caseLog.download", "caseLog": caseId});
+          if (exportPdf != null) {
+            exportPdf.click();
+          } else {
+            alert("Could not download PDF.");
           }
         }
       }
@@ -151,8 +160,6 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
       if (response.options.verify) {
         processingInProgress += 1;
         var errors = [];
-        info = parseInformation(baseInfoInnerTable);
-        codes = parseCodes(codesTable);
 
         age_str = info["Age"].split(" ");
         if (age_str[1].startsWith("year")) {

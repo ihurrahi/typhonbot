@@ -259,7 +259,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           errors.push(["Reason for Visit: New Consult", "CPT Billing Codes"]);
         }
         // Preventative Health
-        has_phealth_cpt = checkCode(codes["CPT Billing Codes"], ["993"]);
+        has_phealth_cpt = checkCode(codes["CPT Billing Codes"], ["9938", "9939"]);
         has_phealth_icd10 = checkCode(codes["ICD-10 Diagnosis Codes"], ["Z00", "Z01.4"]);
         if (has_phealth_cpt && !has_phealth_icd10) {
           errors.push(["Preventative Health ICD10 Diagnosis Codes", "Preventative Health CPT Billing Codes"]);

@@ -3,7 +3,7 @@
 
   "name": "Typhon Bot",
   "description": "A bot to help with specific tasks in Typhon",
-  "version": "0.9",
+  "version": "0.10",
 
   "permissions": [
     "tabs",

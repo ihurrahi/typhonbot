@@ -126,13 +126,24 @@ function parseProcedures(tables) {
          var lines = text.split("\n");
          for (var k = 0; k < lines.length; k++) {
            var comps = lines[k].split(" - ");
-           var key = comps.shift();
+           var key = comps.shift().trim();
            var rest = comps.join(" - ");
-           var competency = rest.substring(0, rest.lastIndexOf("("));
-           var action = rest.substring(rest.lastIndexOf("(") + 1, rest.length - 1);
+           var competency = rest.substring(0, rest.lastIndexOf("(")).trim();
+           var action = rest.substring(rest.lastIndexOf("(") + 1, rest.length - 1).trim();
            res[key].push([competency, action]);
          }
        }
+    }
+  }
+  return res;
+}
+
+function checkProc(procs, search_proc) {
+  var res = false;
+  for (var i = 0; i < procs.length; i++) {
+    console.log(procs[i][0]);
+    if (procs[i][0] == search_proc) {
+      res = true;
     }
   }
   return res;
@@ -205,19 +216,17 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           age = parseInt(age_str[0]) / 365;
         }
         // Confirm age with well child checks if available
-        comps = procs["General/Skills/Counseling Competencies"]
-        for (var i = 0; i < comps.length; i++) {
-          console.log(comps[i][0]);
-          if (comps[i][0].includes("Well Child Check")) {
-            console.log("got here");
-            if (comps[i][0].includes("<1 y/o") && age > 1) {
-              console.log("got here2");
+        gen_comps = procs["General/Skills/Counseling Competencies"];
+        for (var i = 0; i < gen_comps.length; i++) {
+          gen_comp_name = gen_comps[i][0];
+          if (gen_comp_name.includes("Well Child Check")) {
+            if (gen_comp_name.includes("<1 y/o") && age > 1) {
               errors.push(["Age", "Well Child Check Age"]);
-            } else if (comps[i][0].includes("1-4 y/o") && (age < 1 || age > 4)) {
+            } else if (gen_comp_name.includes("1-4 y/o") && (age < 1 || age > 4)) {
               errors.push(["Age", "Well Child Check Age"]);
-            } else if (comps[i][0].includes("5-11 y/o") && (age < 5 || age > 11)) {
+            } else if (gen_comp_name.includes("5-11 y/o") && (age < 5 || age > 11)) {
               errors.push(["Age", "Well Child Check Age"]);
-            } else if (comps[i][0].includes("12-17 y/o") && (age < 12 || age > 17)) {
+            } else if (gen_comp_name.includes("12-17 y/o") && (age < 12 || age > 17)) {
               errors.push(["Age", "Well Child Check Age"]);
             }
           }
@@ -320,6 +329,33 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
         is_intra_op = info["Setting Type"].includes("Intra-op");
         if ((is_scheduled && !is_intra_op) || (!is_scheduled && is_intra_op)) {
           errors.push(["Reason for Visit: Scheduled Procedure", "Surgical Management (intra-op)"]);
+        }
+        // Well Child Check CPT codes
+        wcc_less_than_one = checkProc(gen_comps, "Well Child Check (<1 y/o)");
+        console.log(wcc_less_than_one);
+        wcc_one_to_four = checkProc(gen_comps, "Well Child Check (1-4 y/o)");
+        wcc_five_to_eleven = checkProc(gen_comps, "Well Child Check (5-11 y/o)");
+        wcc_twelve_to_seventeen = checkProc(gen_comps, "Well Child Check/Sports Physical (12-17 y/o)");
+        if (wcc_less_than_one && !is_comprehensive) {
+          errors.push(["Well Child Check", "Type of HP: Comprehensive"]);
+        }
+        if (wcc_one_to_four && !is_comprehensive) {
+          errors.push(["Well Child Check", "Type of HP: Comprehensive"]);
+        }
+        if (wcc_five_to_eleven && !is_comprehensive) {
+          errors.push(["Well Child Check", "Type of HP: Comprehensive"]);
+        }
+        if (wcc_less_than_one && !checkCode(codes["CPT Billing Codes"], ["99381", "99391"])) {
+          errors.push(["Well Child Check", "CPT Billing Codes"]);
+        }
+        if (wcc_one_to_four && !checkCode(codes["CPT Billing Codes"], ["99382", "99392"])) {
+          errors.push(["Well Child Check", "CPT Billing Codes"]);
+        }
+        if (wcc_five_to_eleven && !checkCode(codes["CPT Billing Codes"], ["99383", "99393"])) {
+          errors.push(["Well Child Check", "CPT Billing Codes"]);
+        }
+        if (wcc_twelve_to_seventeen && !checkCode(codes["CPT Billing Codes"], ["99204", "99214", "99384", "99394"])) {
+          errors.push(["Well Child Check", "CPT Billing Codes"]);
         }
 
         if (errors.length > 0) {

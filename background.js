@@ -38,7 +38,9 @@ It tries to verify the following:<br>\
 * Case logs with the Reason for Visit = New Consult should have the CPT Billing code match 9924X and vice versa<br>\
 * Case logs with a preventative health diagnosis (ICD-10 Diagnosis code starting with Z00 or Z01.4) should have the CPT Billing code match 993XX<br>\
 * Case logs with the Reason for Visit = Scheduled Procedure should have Intra-op checked under Surgical Management and vice versa<br>\
-* Case logs with a Well Child Check competency should have the corresponding age<br>";
+* Case logs with a Well Child Check competency should have the corresponding age<br>\
+* Case logs with a Well Child Check that's not a Sports Physical should have Type of HP = Comprehensive<br>\
+* Case logs with a Well Child Check should have the corresponding CPT Billing Codes (<1 y/o = 99381/99391, 1-4 y/o = 99382/99392, 5-11 y/o = 99383/99393, 12-17 y/o = 99204/99214/99384/99394)<br>";
   var errors = "";
   for (var key in seen) {
     if (seen.hasOwnProperty(key)) {

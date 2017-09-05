@@ -14,8 +14,10 @@ function addToSeen(caseLog) {
 
 function getData() {
   var totalDownloads = 0;
-  var res = "Disclaimer: This program attempts to verify the requirements as much as possible, but only assists in the verification and does not replace everything.<br>\
+  var res = "<script>function showHide() {el = document.getElementById('text'); link = document.getElementById('link'); if (el.style.display == 'block') {el.style.display = 'none'; link.innerHTML = '(show)';} else {el.style.display = 'block'; link.innerHTML = '(hide)';}}</script>\
+Disclaimer: This program attempts to verify the requirements as much as possible, but only assists in the verification and does not replace everything.<br>\
 It tries to verify the following:<br>\
+<div id='text' style='display: none'>\
 * Case logs where the patient is >= 65 years old should be a Geriatric rotation and vice versa<br>\
 * Case logs where the CPT Billing Code match 99391 or 99381 should have a patient that is < 1 year old<br>\
 * Case logs where the CPT Billing Code match 99392 or 99382 should have a patient that is >= 1 year old and <= 4 years old<br>\
@@ -40,7 +42,9 @@ It tries to verify the following:<br>\
 * Case logs with the Reason for Visit = Scheduled Procedure should have Intra-op checked under Surgical Management and vice versa<br>\
 * Case logs with a Well Child Check competency should have the corresponding age<br>\
 * Case logs with a Well Child Check that's not a Sports Physical should have Type of HP = Comprehensive<br>\
-* Case logs with a Well Child Check should have the corresponding CPT Billing Codes (<1 y/o = 99381/99391, 1-4 y/o = 99382/99392, 5-11 y/o = 99383/99393, 12-17 y/o = 99204/99214/99384/99394)<br>";
+* Case logs with a Well Child Check should have the corresponding CPT Billing Codes (<1 y/o = 99381/99391, 1-4 y/o = 99382/99392, 5-11 y/o = 99383/99393, 12-17 y/o = 99204/99214/99384/99394)<br>\
+</div>\
+<a id='link' onclick='showHide()' href='javascript:void(0);'>(show)</a><br>";
   var errors = "";
   for (var key in seen) {
     if (seen.hasOwnProperty(key)) {

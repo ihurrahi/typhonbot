@@ -37,7 +37,8 @@ It tries to verify the following:<br>\
 * Case logs with the Reason for Visit = Initial Visit should have the CPT Billing code match 9920X and vice versa<br>\
 * Case logs with the Reason for Visit = New Consult should have the CPT Billing code match 9924X and vice versa<br>\
 * Case logs with a preventative health diagnosis (ICD-10 Diagnosis code starting with Z00 or Z01.4) should have the CPT Billing code match 993XX<br>\
-* Case logs with the Reason for Visit = Scheduled Procedure should have Intra-op checked under Surgical Management and vice versa<br>";
+* Case logs with the Reason for Visit = Scheduled Procedure should have Intra-op checked under Surgical Management and vice versa<br>\
+* Case logs with a Well Child Check competency should have the corresponding age<br>";
   var errors = "";
   for (var key in seen) {
     if (seen.hasOwnProperty(key)) {

@@ -105,6 +105,38 @@ function checkCode(codes, beginning) {
   return res;
 }
 
+function parseProcedures(tables) {
+  var res = {};
+  res["General/Skills/Counseling Competencies"] = [];
+  res["Diagnosis Competencies"] = [];
+  var procedures_skills = false;
+  for (var i = 0; i < tables.length; i++) {
+    var table = tables[i];
+    var rows = table.getElementsByTagName("tr");
+    for (var j = 0; j < rows.length; j++) {
+       var elements = rows[j].getElementsByTagName("td");
+       var text = rows[j].innerText.trim();
+       if (elements[0].getAttribute("bgcolor") == "#000000") {
+         if (text == "Procedures/Skills (Observed/Assisted/Performed)") {
+           procedures_skills = true;
+         } else {
+           procedures_skills = false;
+         }
+       } else if (procedures_skills && text != "") {
+         var lines = text.split("\n");
+         for (var k = 0; k < lines.length; k++) {
+           var comps = lines[k].split(" - ");
+           var key = comps.shift();
+           var rest = comps.join(" - ");
+           var competency = rest.substring(0, rest.lastIndexOf("("));
+           var action = rest.substring(rest.lastIndexOf("(") + 1, rest.length - 1);
+           res[key].push([competency, action]);
+         }
+       }
+    }
+  }
+  return res;
+}
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -132,6 +164,7 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
     if (response.inProgress == true) {
       var tables = document.getElementsByTagName("table");
       var info = parseInformation(tables);
+      var procs = parseProcedures(tables);
       var codes = parseCodes(tables);
       var caseId = parseCaseId();
       var caseUrl = window.location.href;
@@ -170,6 +203,24 @@ chrome.runtime.sendMessage({"message": "inProgress"}, function(response) {
           age = parseInt(age_str[0]) / 52;
         } else if (age_str[1].startsWith("day")) {
           age = parseInt(age_str[0]) / 365;
+        }
+        // Confirm age with well child checks if available
+        comps = procs["General/Skills/Counseling Competencies"]
+        for (var i = 0; i < comps.length; i++) {
+          console.log(comps[i][0]);
+          if (comps[i][0].includes("Well Child Check")) {
+            console.log("got here");
+            if (comps[i][0].includes("<1 y/o") && age > 1) {
+              console.log("got here2");
+              errors.push(["Age", "Well Child Check Age"]);
+            } else if (comps[i][0].includes("1-4 y/o") && (age < 1 || age > 4)) {
+              errors.push(["Age", "Well Child Check Age"]);
+            } else if (comps[i][0].includes("5-11 y/o") && (age < 5 || age > 11)) {
+              errors.push(["Age", "Well Child Check Age"]);
+            } else if (comps[i][0].includes("12-17 y/o") && (age < 12 || age > 17)) {
+              errors.push(["Age", "Well Child Check Age"]);
+            }
+          }
         }
         // Geriatric patients
         geriatric = info["Rotation"].includes("Geriatric")
